@@ -10,78 +10,80 @@ public class AudioManager : MonoBehaviour
     private AudioSource source;
     public bool audioispaused = false;
     private int CurrentSong;
-    private bool SongisShuffled = false;
-    
-  
+   
+
+
 
 
     // Start is called before the first frame update
     void Start()
     {
         source = GetComponent<AudioSource>();
-        
+
     }
 
-     public void Play()
+    public void Play() //Decimos que si no está pausado se empiece de cero la canción y que sí está pausado, la canción continue. 
     {
-        if(!audioispaused)
+        if (!audioispaused)
         {
-            source.PlayOneShot(Audios[0]);
-            Canciones[0].SetActive(true);
+            source.PlayOneShot(Audios[CurrentSong]);
+            Canciones[CurrentSong].SetActive(true);
         }
         else
         {
             source.UnPause();
         }
-        
+
     }
 
-    public  void Pause()
+    public void Pause()
     {
-      source.Pause();
-      audioispaused = true;
+        source.Pause();
+        audioispaused = true;
     }
 
     public void Next()
 
     {
-        if(SongisShuffled = true)
+        source.Stop(); //Paramos la canción.
+        Canciones[CurrentSong].SetActive(false); //Desactivamos el game object con el texto y la imagen de la canción actual. 
+        CurrentSong++;//Sumamos a la canción actual para pasar a la siguiente. 
+
+        if (CurrentSong >= 6) //Indicamos que si llega a la última canción repita la primera. 
         {
-            Shuffle();
-            source.Stop();
-            Canciones[CurrentSong].SetActive(false);
-            source.PlayOneShot(Audios[CurrentSong + 1]);
-            Canciones[CurrentSong + 1].SetActive(true);
+            CurrentSong = 0;
         }
-        else
-        {
-            source.Stop();
-            Canciones[CurrentSong].SetActive(false);
-            source.PlayOneShot(Audios[+1]);
-            Canciones[+1].SetActive(true);
-        }
-  
-       
+
+        source.PlayOneShot(Audios[CurrentSong]);
+        Canciones[CurrentSong].SetActive(true);
     }
 
-    public void Preview()
+    public void Preview() //Hacemos lo mismo que en Next() pero a la inversa para poder ir hacia atrás.
     {
         source.Stop();
-        source.PlayOneShot(Audios[CurrentSong - 1]);
         Canciones[CurrentSong].SetActive(false);
-        Canciones[CurrentSong - 1].SetActive(true);
+        CurrentSong--;
+
+        if (CurrentSong <= -1)
+        {
+            CurrentSong = 5;
+        }
+
+        source.PlayOneShot(Audios[CurrentSong]);
+        Canciones[CurrentSong].SetActive(true);
     }
 
-    public  void Shuffle()
+    public void Shuffle()
     {
-        CurrentSong = Random.Range(0, 5);
-        SongisShuffled = true;
-
+        Canciones[CurrentSong].SetActive(false);
+        CurrentSong = Random.Range(0, 5); //Que se reproduzca de forma random entre el track 1 y el 6.
+        CurrentSong++;
+        source.PlayOneShot(Audios[CurrentSong]);
+        Canciones[CurrentSong].SetActive(true);
     }
 
-    public  void Repeat()
+    public void Repeat()
     {
-
+        source.loop = true; //Activamos el loop de la canción actual. 
     }
-
 }
